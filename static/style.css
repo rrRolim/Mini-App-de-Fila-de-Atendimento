@@ -1,0 +1,198 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, Arial, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+}
+
+.topo {
+    background: #172554;
+    color: white;
+    padding: 28px 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.topo h1 { margin: 0 0 5px; }
+.topo p { margin: 0; opacity: .8; }
+
+.auto {
+    font-size: 13px;
+    background: rgba(255,255,255,.12);
+    padding: 9px 13px;
+    border-radius: 999px;
+}
+
+.container {
+    width: min(1180px, 92%);
+    margin: 28px auto 60px;
+}
+
+.mensagens { margin-bottom: 20px; }
+.alert {
+    padding: 13px 16px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+.alert.sucesso { background: #dcfce7; color: #166534; }
+.alert.erro { background: #fee2e2; color: #991b1b; }
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.card, .painel {
+    background: white;
+    border: 1px solid #e5eaf1;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(25, 45, 80, .05);
+}
+
+.card {
+    padding: 20px;
+}
+.card span { color: #64748b; font-size: 14px; }
+.card strong { display: block; font-size: 32px; margin-top: 8px; }
+
+.grid {
+    display: grid;
+    grid-template-columns: 310px 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.painel { padding: 22px; }
+.painel h2 { margin: 0 0 7px; font-size: 20px; }
+.painel-titulo p {
+    color: #64748b;
+    margin: 0 0 18px;
+    font-size: 13px;
+}
+
+label {
+    display: block;
+    margin: 14px 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    font-size: 14px;
+    background: white;
+}
+
+.btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 12px 15px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: .15s;
+}
+.btn:hover { transform: translateY(-1px); }
+.primario { width: 100%; margin-top: 18px; background: #2563eb; color: white; }
+.chamar { width: 100%; margin-top: 12px; background: #172554; color: white; }
+.pequeno { padding: 8px 10px; font-size: 12px; background: #e2e8f0; color: #172033; }
+.sucesso-btn { background: #dcfce7; color: #166534; }
+.perigo-btn { background: #fee2e2; color: #991b1b; }
+
+.lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cliente {
+    display: grid;
+    grid-template-columns: 38px 1fr auto;
+    gap: 13px;
+    align-items: center;
+    border: 1px solid #e5eaf1;
+    border-radius: 12px;
+    padding: 13px;
+}
+.cliente.em-atendimento {
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
+.numero {
+    width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #e8eefc;
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.dados h3 { margin: 0 0 5px; font-size: 15px; }
+.dados small { color: #64748b; }
+
+.tags { display: flex; gap: 6px; margin-bottom: 5px; }
+.tag {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.normal { background: #f1f5f9; color: #475569; }
+.preferencial { background: #fef3c7; color: #92400e; }
+.status { background: #dbeafe; color: #1d4ed8; }
+.concluido-tag { background: #dcfce7; color: #166534; }
+.cancelado-tag { background: #fee2e2; color: #991b1b; }
+
+.acoes {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.vazio {
+    padding: 28px;
+    text-align: center;
+    color: #64748b;
+}
+
+.historico { margin-top: 22px; }
+.tabela-wrap { overflow-x: auto; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+}
+th, td {
+    text-align: left;
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5eaf1;
+}
+th { color: #64748b; font-size: 12px; }
+
+@media (max-width: 850px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 550px) {
+    .topo { flex-direction: column; align-items: flex-start; }
+    .cards { grid-template-columns: 1fr 1fr; }
+    .cliente { grid-template-columns: 34px 1fr; }
+    .acoes { grid-column: 2; justify-content: flex-start; }
+}

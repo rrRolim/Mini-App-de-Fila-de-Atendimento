@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fila de Atendimento</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topo">
+    <div>
+        <h1>Fila de Atendimento</h1>
+        <p>Gerenciamento de clientes • FIFO + prioridade</p>
+    </div>
+    <div class="auto">● Atualização automática</div>
+</header>
+
+<main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mensagens">
+        {% for categoria, mensagem in messages %}
+          <div class="alert {{ categoria }}">{{ mensagem }}</div>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="cards">
+        <div class="card"><span>Aguardando</span><strong>{{ aguardando }}</strong></div>
+        <div class="card atendimento"><span>Em atendimento</span><strong>{{ em_atendimento }}</strong></div>
+        <div class="card concluido"><span>Concluídos</span><strong>{{ concluidos }}</strong></div>
+        <div class="card cancelado"><span>Cancelados</span><strong>{{ cancelados }}</strong></div>
+    </section>
+
+    <section class="grid">
+        <div class="painel cadastro">
+            <h2>Adicionar cliente</h2>
+            <form action="{{ url_for('cadastrar') }}" method="post">
+                <label for="nome">Nome do cliente</label>
+                <input id="nome" name="nome" type="text" placeholder="Ex.: Maria Silva" required maxlength="100">
+
+                <label for="prioridade">Prioridade</label>
+                <select id="prioridade" name="prioridade">
+                    <option value="Normal">Normal</option>
+                    <option value="Preferencial">Preferencial</option>
+                </select>
+
+                <button class="btn primario" type="submit">+ Entrar na fila</button>
+            </form>
+
+            <form action="{{ url_for('chamar_proximo') }}" method="post">
+                <button class="btn chamar" type="submit">📢 Chamar próximo</button>
+            </form>
+        </div>
+
+        <div class="painel">
+            <div class="painel-titulo">
+                <div>
+                    <h2>Fila atual</h2>
+                    <p>Preferenciais são chamados antes dos normais; dentro de cada grupo, mantém-se a ordem de chegada.</p>
+                </div>
+            </div>
+
+            <div id="fila" class="lista">
+                {% if fila %}
+                    {% for cliente in fila %}
+                    <article class="cliente {{ 'em-atendimento' if cliente.status == 'Em Atendimento' else '' }}">
+                        <div class="numero">{{ loop.index }}</div>
+                        <div class="dados">
+                            <h3>{{ cliente.nome }}</h3>
+                            <div class="tags">
+                                <span class="tag {{ 'preferencial' if cliente.prioridade == 'Preferencial' else 'normal' }}">
+                                    {{ cliente.prioridade }}
+                                </span>
+                                <span class="tag status">{{ cliente.status }}</span>
+                            </div>
+                            <small>Entrada: {{ cliente.criado_em }}</small>
+                        </div>
+                        <div class="acoes">
+                            {% if cliente.status == 'Aguardando' %}
+                            <form action="{{ url_for('alterar_status', id=cliente.id) }}" method="post">
+                                <input type="hidden" name="status" value="Em Atendimento">
+                                <button class="btn pequeno" type="submit">Atender</button>
+                            </form>
+                            {% else %}
+                            <form action="{{ url_for('alterar_status', id=cliente.id) }}" method="post">
+                                <input type="hidden" name="status" value="Concluído">
+                                <button class="btn pequeno sucesso-btn" type="submit">Concluir</button>
+                            </form>
+                            {% endif %}
+
+                            <form action="{{ url_for('cancelar', id=cliente.id) }}" method="post"
+                                  onsubmit="return confirm('Cancelar este atendimento?')">
+                                <button class="btn pequeno perigo-btn" type="submit">Cancelar</button>
+                            </form>
+                        </div>
+                    </article>
+                    {% endfor %}
+                {% else %}
+                    <div class="vazio">A fila está vazia.</div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="painel historico">
+        <h2>Histórico de atendimentos</h2>
+        <div class="tabela-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Entrada</th>
+                        <th>Chamada</th>
+                        <th>Finalização</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in historico %}
+                    <tr>
+                        <td>{{ item.nome }}</td>
+                        <td>{{ item.prioridade }}</td>
+                        <td><span class="tag {{ 'cancelado-tag' if item.status == 'Cancelado' else 'concluido-tag' }}">{{ item.status }}</span></td>
+                        <td>{{ item.criado_em }}</td>
+                        <td>{{ item.chamado_em or '-' }}</td>
+                        <td>{{ item.concluido_em or item.cancelado_em or '-' }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6" class="vazio">Nenhum atendimento finalizado ainda.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+let ultimaFila = "";
+
+async function atualizarFila() {
+    try {
+        const resposta = await fetch("/api/fila");
+        if (!resposta.ok) return;
+        const dados = await resposta.json();
+        const assinatura = JSON.stringify(dados);
+        if (assinatura !== ultimaFila) {
+            ultimaFila = assinatura;
+            // Recarrega apenas quando uma mudança foi detectada.
+            // Assim a fila, contadores e histórico permanecem sincronizados.
+            location.reload();
+        }
+    } catch (erro) {
+        console.log("Atualização automática indisponível.");
+    }
+}
+
+setInterval(atualizarFila, 300000);
+</script>
+</body>
+</html>
